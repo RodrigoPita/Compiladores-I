@@ -10,11 +10,11 @@ enum TOKEN { _ID = 256, _FOR, _IF, _INT, _FLOAT, _MAIG, _MEIG, _IG, _DIF, _STRIN
 
 /* Coloque aqui definições regulares */
 D       [0-9]
-L       [A-Za-z_$]
+L       [ÁA-Záa-z_$]
 
 WS	[ \t\n]
-STRING  (("\"")(({L}|{D}|{WS}|("\\")|("\'"))*)("\""))|(('\'')(({L}|{D}|{WS})*)('\''))
-STRING2 ("`")({L}|{D}|{WS})+("`")
+STRING  (("\"")(({L}|{D}|{WS}|("\\")|("\'")|("\\\""))*)("\""))|('(({L}|{D}|{WS}|("\\")|("\'")|("\\\""))*)')
+STRING2 ("`")(({L}|{D}|{WS}|("\\")|("\'")|("\\\""))*)+("`")
 COMENTARIO (("/*")({L}|{D}|{WS})+("*/"))|(("//")({L}|{D}|{WS})+("EOL")|("\n"))
 INT     {D}+
 FLOAT   {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
