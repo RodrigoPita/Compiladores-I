@@ -15,7 +15,7 @@ L       [ÁA-Záa-z_$/*]
 WS	[ \t\n]
 STRING  (("\"")(({L}|{D}|{WS}|("\\")|("\'")|("\\\"")|("\"\""))*)("\""))|('(({L}|{D}|{WS}|("\\")|("\\\'")|("\"")|("\'\'"))*)')
 STRING2 ("`")(({L}|{D}|{WS}|("\n")|("\\")|("\'")|("\""))*)+("`")
-COMENTARIO (("/*")(({L}|{D}|{WS}|("\n")|("+"))*)+("*/"))
+COMENTARIO (("/*")(({L}|{D}|{WS}|("\n")|("+"))*)("*/"))|(("//")(({L}|{D}|{WS}|("+"))*)("\n"))
 INT     {D}+
 FLOAT   {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
 ID      {L}({L}|{D})*
@@ -25,7 +25,19 @@ ID      {L}({L}|{D})*
 
 {WS}	{ /* ignora espaços, tabs e '\n' */ } 
 "if"            { return _IF; }
+"iF"            { return _IF; }
+"If"            { return _IF; }
+"IF"            { return _IF; }
+
 "for"           { return _FOR; }
+"foR"           { return _FOR; }
+"fOr"           { return _FOR; }
+"fOR"           { return _FOR; }
+"For"           { return _FOR; }
+"FoR"           { return _FOR; }
+"FOr"           { return _FOR; }
+"FOR"           { return _FOR; }
+
 {STRING}        { return _STRING; }
 {STRING2}       { return _STRING2; }
 {COMENTARIO}    { return _COMENTARIO; }
