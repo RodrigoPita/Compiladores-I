@@ -30,7 +30,9 @@ ID	    ({L}|{S})({L}|{D}|{S})*
 %%
 
 {WS}  		{ }
+{STRING}    { return _STRING; }
 {NUM} 		{ return tk_cte_int; }
+{FLOAT}     { return _FLOAT; }
 "char"		{ return tk_char; }
 "int"		{ return tk_int; }
 "double"	{ return tk_double; }
