@@ -44,9 +44,9 @@ ID	    ({L})({L}|{D})*
 %%
 
 {WS}  		{ }
-{STRING}    { return _STRING; }
+{STRING}    { return tk_str; }
 {NUM} 		{ return tk_cte_int; }
-{FLOAT}     { return _FLOAT; }
+{FLOAT}     { return tk_float; }
 "char"		{ return tk_char; }
 "int"		{ return tk_int; }
 "double"	{ return tk_double; }
