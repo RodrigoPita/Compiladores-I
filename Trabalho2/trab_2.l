@@ -1,180 +1,291 @@
-%{
+%{ 
 #include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
 #include <map>
-  
+#include <vector>
+#include <string>
+#include <iostream>
+
 using namespace std;
 
-int token;
-
-void P();
-void A();
-void R();
-void L();
-void V();
-void VS();
-void T();
-void casa( int );
-
-enum { tk_int = 256, tk_char, tk_double, tk_id, tk_cte_int, tk_str, tk_float };
-
-map<int,string> nome_tokens = {
-  { tk_int, "int" },
-  { tk_char, "char" },
-  { tk_double, "double" },
-  { tk_id, "nome de identificador" },
-  { tk_cte_int, "constante inteira" },
-  { tk_str, "string" },
-  { tk_float, "float" }
+struct Valor {
+  bool isNumber;
+  double valNum;
+  string valStr;
+  
+  Valor(): isNumber(true), valNum(0), valStr("") {}
+  Valor( double valNum ): isNumber(true), valNum(valNum), valStr("") {}
+  Valor( string valStr ): isNumber(false), valNum(0), valStr(valStr) {}
 };
+
+enum TOKEN { CDOUBLE = 256, CSTR, ID };
+
+int linha = 1;
+int coluna = 1;
+string lexema;
+
+typedef void (*Funcao)();
+
+vector<Valor> pilha;
+map<string, Valor> var;
+
+int token( int );
+void erro( string msg );
 
 %}
 
-D       [0-9]
-L       [A-Za-z_]
-
-WS	    [ \n\t]
-STRING  (("\"")(({L}|{D}|{WS}|("\\")|("\'")|("\\\"")|("\"\""))*)("\""))
-
-NUM	    {D}+
-FLOAT   {NUM}("."{NUM})?([Ee]("+"|"-")?{NUM})?
-ID	    ({L})({L}|{D})*
+DIGITO  [0-9]
+LETRA   [A-Za-z_]
+DOUBLE  {DIGITO}+("."{DIGITO}+)?
+ID      {LETRA}({LETRA}|{DIGITO})*
+STR 	\"([^\"\n]|(\\\")|\"\")+\"
 
 %%
 
-{WS}  		{ }
-{STRING}    { return tk_str; }
-{NUM} 		{ return tk_cte_int; }
-{FLOAT}     { return tk_float; }
-"char"		{ return tk_char; }
-"int"		{ return tk_int; }
-"double"	{ return tk_double; }
+"\t"       { coluna += 4; }
+" "        { coluna++; }
+"\n"	   { linha++; coluna = 1; }
 
-{ID}		{ return tk_id; }
+{DOUBLE}   { return token( CDOUBLE ); }
+{STR}	   { return token( CSTR ); }
 
-.		{ return yytext[0]; }
+
+{ID}       { return token( ID ); }
+
+.          { return token( *yytext ); }
 
 %%
 
-int next_token() {
-  return yylex();
+int token( int tk ) {  
+  lexema = yytext; 
+  coluna += strlen( yytext ); 
+
+  return tk;
 }
 
-string nome_token( int token ) {
-  if( nome_tokens.find( token ) != nome_tokens.end() )
-    return nome_tokens[token];
-  else {
-    string r;
-    
-    r = token;
-    return r;
-  }
-}
-
-void P() {
-  if( token == '*' ) {
-    casa( '*' );
-    P();
-  }
+void erro( string msg ) {
+  cout << "*** Erro: ***" << endl
+       << "Linha: " << linha << ", coluna: " << coluna_anterior << endl
+       << msg << endl;
+  exit( 1 );
 }
 
 void A() {
-  if( token == '[' ) {
-    casa( '[' );
-    casa( tk_cte_int );
-    casa( ']' );
-    A();
-  }
+// Guardamos o lexema pois a função 'casa' altera o seu valor.
+  string temp = lexema; 
+  casa( ID );
+  print( temp );
+  casa( '=' );
+  E();
+  print( "=" );
 }
 
-void R() {
-  if( token == ',' ) {
-    casa( ',' );
-    P();
-    casa( tk_id );
-    A();
-    R();
-  }
+void E() {
+  T();
+  E_linha();
 }
 
-void L() {
-  P();
-  casa( tk_id );
-  A();
-  R();
+void E_linha() {
+  switch( token ) {
+    case '+' : casa( '+' ); T(); print( "+"); E_linha(); break;
+    case '-' : casa( '-' ); T(); print( "-"); E_linha(); break;
+  }
 }
 
 void T() {
+  F();
+  T_linha();
+}
+
+void T_linha() {
   switch( token ) {
-    case tk_int : casa( tk_int ); break;
-    case tk_char : casa( tk_char ); break;
-    case tk_double : casa( tk_double ); break;
-    
-    default:
-      cout << "Tipo esperado "  
-	   << " , encontrado: " << nome_token( token ) << endl;
-    exit( 1 );
+    case '*' : casa( '*' ); F(); print( "*"); T_linha(); break;
+    case '/' : casa( '/' ); F(); print( "/"); T_linha(); break;
   }
 }
 
-void V() {
-  T();  
-  L(); 
-  casa( ';' );
+void F() {
+  switch( token ) {
+    case ID : {
+      string temp = lexema;
+      casa( ID ); print( temp + "@" ); } 
+      break;
+    case NUM : {
+      string temp = lexema;
+      casa( NUM ); print( temp ); }
+      break;
+    case '(': 
+      casa( '(' ); E(); casa( ')' ); break;
+    default:
+      erro( "Operando esperado, encontrado " + lexema );
+  }
 }
-
 
 void casa( int esperado ) {
   if( token == esperado )
     token = next_token();
-  else {
-      cout << "Esperado " << nome_token( esperado ) 
-	   << " , encontrado: " << nome_token( token ) << endl;
-    exit( 1 );
-  }
+  else 
+    erro( "Esperado " + nome_token( esperado ) +
+	  ", encontrado: " + nome_token( token ) );
 }
 
-void VS() {
-  V();
-  switch( token ) { // verificando se o próximo símbolo da entrada
-		    // é o início de uma declaração de variável.
-    case tk_int:
-    case tk_char:
-    case tk_double:
-      VS();
-      break;
-  }
+inline void push( Valor valor ) {
+  pilha.push_back( valor );
 }
+
+inline void push( double valor ) {
+  push( Valor( valor ) );
+}
+
+inline void push( string valor ) {
+  push( Valor( valor ) );
+}
+
+inline Valor pop() {
+  if( pilha.size() <= 0 )
+    erro( "Tentou desempilhar mas a pilha está vazia" );
+  
+  Valor temp = pilha.back();
+  pilha.pop_back();
+  
+  return temp;
+}
+
+inline double pop_number() {
+  Valor temp = pop();
+  
+  if( !temp.isNumber )
+    erro( "Esperado um operando numérico, encontrado \"" + temp.valStr + "\"" );
+    
+  return temp.valNum;
+}
+
+inline string pop_string() {
+  Valor temp = pop();
+  
+  if( temp.isNumber )
+    erro( "Esperado um operando string, encontrado " + to_string( temp.valNum ) );
+    
+  return temp.valStr;
+}
+
+inline ostream& operator << ( ostream& o, const Valor& valor ) {
+  if( valor.isNumber )
+      o << "Num: " << valor.valNum;
+    else
+      o << "Str: " << valor.valStr;
+      
+  return o;
+}
+
+inline ostream& operator << ( ostream& o, const map<string,Valor>& v ) {
+  for( auto x : v ) 
+    cout << "|" << x.first << " ==> " << x.second << "|" << endl;
+  return o;
+}
+
+inline ostream& operator << ( ostream& o, const vector<Valor>& v ) {
+  for( unsigned int i = 0; i < 10 && i < v.size(); i++ ) 
+    cout << "|" << v[i] << "|" << endl;
+  return o;
+}
+
+inline void erro( string msg ) {
+  cout << "=== Erro: " << msg << " ===" <<endl;
+  cout << "=== Vars ===" << endl << var;
+  cout << "=== Pilha ===" << endl << pilha;
+  exit( 0 ); 
+}
+
+map<string, Funcao> func = {
+  { "max", []() { double b = pop_number();
+		  double a = pop_number();
+		  push( a > b ? a : b ); } },
+  { "print", []() { cout << pop() << endl; } }, 
+  { "dtos", []() { push( to_string( pop_number() ) ); } }
+};
 
 int main() {
-  token = next_token();
-  VS();
+  int token = yylex();
+  auto p = func.begin();
+  string nome;
+  double op1, op2;
+  Valor val;
   
-  if( token == 0 )
-    cout << "Sintaxe ok!" << endl;
-  else
-    cout << "Caracteres encontrados após o final do programa" << endl;
+  cout << "=== Console ===" << endl;
+
+  while( token != 0 ) {
+    switch( token ) {
+      case CDOUBLE:
+	push( stod( lexema ) ); 
+	break;
+
+      case ID:
+	push( lexema );
+	break;
+	
+      case CSTR:
+	push( lexema.substr( 1, lexema.size() - 2 ) );
+	break;
+	
+      case '#': 
+	if( (p = func.find( nome = pop_string() )) == func.end() ) {
+	  erro( "Funcao não definida: " + nome );
+	}
+	
+	(p->second)();
+      break;
+      
+      case '@':
+	push( var[pop_string()] );
+	break;
+	
+      case '=':
+	val = pop();
+	var[pop_string()] = val;
+	break;
+	
+      case '+':
+	val = pop();
+	
+	if( val.isNumber ) 
+	  push( pop_number() + val.valNum );
+	else  
+	  push( pop_string() + val.valStr );
+	
+	break;
+
+      case '-':
+	op2 = pop_number();
+	op1 = pop_number();
+	
+	push( op1 - op2 ); 
+	break;
+
+      case '/':
+	op2 = pop_number();
+	op1 = pop_number();
+	
+	push( op1 / op2 ); 
+	break;
+
+      case '*':
+	op2 = pop_number();
+	op1 = pop_number();
+	
+	push( op1 * op2 ); 
+	break;	
+    
+      default:
+	erro( "Instrução ou operador inválido: " + lexema );
+    }
+    
+    token = yylex();
+  }
+  
+  cout << "=== Vars ===" << endl << var;
+  cout << "=== Pilha ===" << endl << pilha;
   
   return 0;
 }
 
-/*
-A -> id { Print( id ); } = E { Print( "="); }
-void A() {
-    casa(ID); Print( lexema ); casa ("="); E(); Print( "=");
-}
-E -> E + T { Print( "+"); }
-    | E - T { Print( "-"); }
-    | T
-T -> T * F { Print( "*"); }
-    | T / F { Print( "/"); }
-    | F
-F -> id { Print(id + "@"); }
-    | num { Print( num ); }
-    | ( E )
-X -> P ^ X
-    | P
-P -> P |
-    | F
-*/
+ 
