@@ -3,7 +3,7 @@
 WS	        [ \t\n]
 
 D           [0-9]
-L           [a-zA-Z_]
+L           [a-zA-Z_á]
 
 ID          ({L}|"$")({L}|{D})*
 
@@ -12,6 +12,9 @@ FLOAT       {D}+("."{D}+)?([Ee][+\-]?{D}+)?
 
 FOR         [Ff][Oo][Rr]
 IF          [Ii][Ff]
+
+STRING      ("\""({L}|{D}|" "|"\'"|"\\"|"\\\"")*"\"")|("\'"({L}|{D}|" "|"\""|"\\"|"\\\'")*"\'")
+STRING2     ("\`"({L}|{D}|{WS}|"\'")*"\`")
 
 COMENTARIO  ("/*")+({L}|{D}|{WS})+("*/")
 
@@ -28,6 +31,7 @@ COMENTARIO  ("/*")+({L}|{D}|{WS})+("*/")
 {INT}           { return _INT; }
 {FLOAT}         { return _FLOAT; }
 
+{STRING}        { return _STRING; }
 {COMENTARIO}    { return _COMENTARIO; }
 
 {ID}            { return _ID; }
