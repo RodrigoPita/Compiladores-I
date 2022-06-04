@@ -482,7 +482,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "trab_1.l"
+#line 1 "scan.lex"
 /* Coloque aqui definições regulares */
 #line 488 "lex.yy.c"
 
@@ -701,9 +701,9 @@ YY_DECL
 		}
 
 	{
-#line 23 "trab_1.l"
+#line 23 "scan.lex"
 
-#line 25 "trab_1.l"
+#line 25 "scan.lex"
     /* Padrões e ações. Nesta seção, comentários devem ter um tab antes */
 
 #line 710 "lex.yy.c"
@@ -766,80 +766,80 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 27 "trab_1.l"
+#line 27 "scan.lex"
 { /* ignora espaços, tabs e '\n' */ } 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 29 "trab_1.l"
+#line 29 "scan.lex"
 { return _IF; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 30 "trab_1.l"
+#line 30 "scan.lex"
 { return _FOR; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 32 "trab_1.l"
+#line 32 "scan.lex"
 { return _INT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 33 "trab_1.l"
+#line 33 "scan.lex"
 { return _FLOAT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 35 "trab_1.l"
+#line 35 "scan.lex"
 { return _STRING; }
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 36 "trab_1.l"
+#line 36 "scan.lex"
 { return _STRING2; }
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 37 "trab_1.l"
+#line 37 "scan.lex"
 { return _COMENTARIO; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 39 "trab_1.l"
+#line 39 "scan.lex"
 { return _ID; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 41 "trab_1.l"
+#line 41 "scan.lex"
 { return _MAIG; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 42 "trab_1.l"
+#line 42 "scan.lex"
 { return _MEIG; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 43 "trab_1.l"
+#line 43 "scan.lex"
 { return _IG; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 44 "trab_1.l"
+#line 44 "scan.lex"
 { return _DIF; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 47 "trab_1.l"
+#line 47 "scan.lex"
 { return *yytext; 
           /* Essa deve ser a última regra. Dessa forma qualquer caractere isolado será retornado pelo seu código ascii. */ }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 50 "trab_1.l"
+#line 50 "scan.lex"
 ECHO;
 	YY_BREAK
 #line 846 "lex.yy.c"
@@ -1847,7 +1847,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 50 "trab_1.l"
+#line 50 "scan.lex"
 
 
 /* Não coloque nada aqui - a função main é automaticamente incluída na hora de avaliar e dar a nota. */
