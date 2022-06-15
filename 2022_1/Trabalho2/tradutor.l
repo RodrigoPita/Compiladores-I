@@ -1,7 +1,12 @@
 %{
+#include <string>
 #include <stdlib.h>
 #include <stdio.h>
-  
+#include <iostream>
+#include <map>
+
+using namespace std;
+
 int token;
 
 void A();
@@ -12,7 +17,19 @@ void T_linha();
 void F();
 void casa( int );
 
+void erro( string msg );
+void print( string st );
+
 enum { ID = 256, NUM, PRINT, STRING };
+
+map<int,string> nome_tokens = {
+  { NUM, "inteiro ou real" },
+  { STRING, "string" },
+  { ID, "nome de identificador" },
+  { PRINT, "print" }
+};
+
+
 %}
 
 WS	        [ \t\n]
@@ -24,7 +41,7 @@ ID          {L}({L}|{D})*
 
 INT         {D}+
 
-NUM	{INT}("."{INT})?([Ee]("+"|"-")?{INT})?
+NUM	        {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
 
 STRING      ("\""({L}|{D}|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
 
@@ -36,9 +53,9 @@ STRING      ("\""({L}|{D}|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
 {NUM}   	{ return NUM; }
 "print" 	{ return PRINT; }
 
-{ID}		{ return ID; }
+{ID}		  { return ID; }
 
-.		{ return yytext[0]; }
+.		      { return yytext[0]; }
 
 %%
 
@@ -108,6 +125,10 @@ void casa( int esperado ) {
     printf( "Esperado %d, encontrado: %d\n", esperado, token );
     exit( 1 );
   }
+}
+
+void print( string st ) {
+  cout << st << " ";
 }
 
 int main() {
