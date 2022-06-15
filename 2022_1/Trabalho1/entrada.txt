@@ -1,0 +1,34 @@
+1 1.0 1.1 2.000001 10e-9 10.34e+9 0.4e31
+
+
+if ( a5 > beaba + _1 )
+
+
+if( $a >= 1e-5 )
+
+
+ a $_ $ = "Um texto";
+
+
+ $ = "Uma String" "outra\t string" "d'ouro";
+
+
+ a = "Um \"texto" 'd\'água' 'd''ouro " ""';
+
+
+ a = "Um ""texto \o/ //\\/* */" ;
+
+ `  string ' "/*" '
+*/ //
+`;
+
+
+ a = 2; /* Um comentario */
+
+
+ a = 2; /* Um comentario */ // outro */
+
+
+/* Texto
++ / * a
+*/
