@@ -12,7 +12,7 @@ void T_linha();
 void F();
 void casa( int );
 
-enum { tk_int = 256, tk_string, tk_double, tk_id, tk_cte_int, tk_print };
+enum { ID = 256, NUM, PRINT, STRING };
 %}
 
 WS	        [ \t\n]
@@ -20,24 +20,23 @@ WS	        [ \t\n]
 D           [0-9]
 L           [a-zA-Z_á]
 
-ID          ({L}|"$")({L}|{D})*
+ID          {L}({L}|{D})*
 
 INT         {D}+
+
+NUM	{INT}("."{INT})?([Ee]("+"|"-")?{INT})?
 
 STRING      ("\""({L}|{D}|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
 
 %%
 
-{WS}	{ /* ignora espaços, tabs e '\n' */ } 
+{WS}		{ /* ignora espaços, tabs e '\n' */ }
 
-{INT}           { return tk_cte_int; }
-"int"           { return tk_int; }
-"double"        { return tk_double; }
-"print"         { return tk_print; }
+{STRING} 	{ return STRING; }
+{NUM}   	{ return NUM; }
+"print" 	{ return PRINT; }
 
-{STRING}        { return tk_string; }
-
-{ID}		{ return tk_id; }
+{ID}		{ return ID; }
 
 .		{ return yytext[0]; }
 
@@ -91,6 +90,10 @@ void F() {
       string temp = lexema;
       casa( NUM ); print( temp ); }
       break;
+    case STRING : {
+        string temp = lexema;
+        casa( STRING ); print( temp ); }
+        break;
     case '(': 
       casa( '(' ); E(); casa( ')' ); break;
     default:
