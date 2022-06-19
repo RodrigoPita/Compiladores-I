@@ -71,7 +71,10 @@ void A() {
       E();
       print( "print #" ); }
       break;
+    default: return;
   }
+  casa( ';' );
+  A();
 }
 
 void E() {
@@ -111,7 +114,7 @@ void F() {
   switch( token ) {
     case tk_id : {
       string temp = yytext;
-      casa( tk_id ); print( temp + "@" ); } 
+      casa( tk_id ); print( temp + " @" ); } 
       break;
     case tk_cte_int: {
       string temp = yytext;
