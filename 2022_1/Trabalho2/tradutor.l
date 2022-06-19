@@ -14,6 +14,7 @@ void E_linha();
 void T();
 void T_linha();
 void F();
+void SU();
 void casa( int );
 
 void erro( string msg );
@@ -67,6 +68,7 @@ void A() {
       break;
     case tk_print : {
       casa( tk_print );
+      E();
       print( "print #" ); }
       break;
   }
@@ -85,7 +87,7 @@ void E_linha() {
 }
 
 void T() {
-  F();
+  SU();
   T_linha();
 }
 
@@ -93,6 +95,15 @@ void T_linha() {
   switch( token ) {
     case '*' : casa( '*' ); F(); print( "*" ); T_linha(); break;
     case '/' : casa( '/' ); F(); print( "/" ); T_linha(); break;
+  }
+}
+
+void SU() {
+  /* Sinais Unarios */
+  switch ( token ) {
+    case '+': casa( '+' ); T();
+    case '-': print( "0" ); casa( '-' ); T(); print( "-" ); break;
+    default: F();
   }
 }
 
