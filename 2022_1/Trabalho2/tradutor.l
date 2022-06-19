@@ -1,5 +1,4 @@
 %{
-#include <string>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -20,42 +19,34 @@ void casa( int );
 void erro( string msg );
 void print( string st );
 
-enum { ID = 256, NUM, PRINT, STRING };
-
-map<int,string> nome_tokens = {
-  { NUM, "inteiro ou real" },
-  { STRING, "string" },
-  { ID, "nome de identificador" },
-  { PRINT, "print" }
-};
-
+enum { tk_cte_int = 256, tk_cte_double, tk_id, tk_print, tk_string };
 
 %}
 
-WS	        [ \t\n]
+WS	[ \n\t]
+D	[0-9]
+L	[A-Za-z_]
 
-D           [0-9]
-L           [a-zA-Z_á]
+INT	{D}+
 
-ID          {L}({L}|{D})*
+NUM {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
 
-INT         {D}+
+STRING ("\""({L}|{D}|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
 
-NUM	        {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
-
-STRING      ("\""({L}|{D}|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
+ID	{L}({L}|{D})*
 
 %%
 
 {WS}		{ /* ignora espaços, tabs e '\n' */ }
 
-{STRING} 	{ return STRING; }
-{NUM}   	{ return NUM; }
-"print" 	{ return PRINT; }
+{STRING} 	{ return tk_string; }
+{INT}       { return tk_cte_int; }
+{NUM}   	{ return tk_cte_double; }
+"print" 	{ return tk_print; }
 
-{ID}		  { return ID; }
+{ID}		  { return tk_id; }
 
-.		      { return yytext[0]; }
+.		{ return yytext[0]; }
 
 %%
 
@@ -65,12 +56,20 @@ int next_token() {
 
 void A() {
 // Guardamos o lexema pois a função 'casa' altera o seu valor.
-  string temp = lexema; 
-  casa( ID );
-  print( temp );
-  casa( '=' );
-  E();
-  print( "=" );
+  string temp = yytext; 
+  switch( token ) {
+    case tk_id : {
+      casa( tk_id );
+      print( temp );
+      casa( '=' );
+      E();
+      print( "=" ); }
+      break;
+    case tk_print : {
+      casa( tk_print );
+      print( "print #" ); }
+      break;
+  }
 }
 
 void E() {
@@ -80,8 +79,8 @@ void E() {
 
 void E_linha() {
   switch( token ) {
-    case '+' : casa( '+' ); T(); print( "+"); E_linha(); break;
-    case '-' : casa( '-' ); T(); print( "-"); E_linha(); break;
+    case '+' : casa( '+' ); T(); print( "+" ); E_linha(); break;
+    case '-' : casa( '-' ); T(); print( "-" ); E_linha(); break;
   }
 }
 
@@ -92,31 +91,37 @@ void T() {
 
 void T_linha() {
   switch( token ) {
-    case '*' : casa( '*' ); F(); print( "*"); T_linha(); break;
-    case '/' : casa( '/' ); F(); print( "/"); T_linha(); break;
+    case '*' : casa( '*' ); F(); print( "*" ); T_linha(); break;
+    case '/' : casa( '/' ); F(); print( "/" ); T_linha(); break;
   }
 }
 
 void F() {
   switch( token ) {
-    case ID : {
-      string temp = lexema;
-      casa( ID ); print( temp + "@" ); } 
+    case tk_id : {
+      string temp = yytext;
+      casa( tk_id ); print( temp + "@" ); } 
       break;
-    case NUM : {
-      string temp = lexema;
-      casa( NUM ); print( temp ); }
+    case tk_cte_int: {
+      string temp = yytext;
+      casa( tk_cte_int ); print( temp ); }
       break;
-    case STRING : {
-        string temp = lexema;
-        casa( STRING ); print( temp ); }
+    case tk_cte_double : {
+      string temp = yytext;
+      casa( tk_cte_double ); print( temp ); }
+      break;
+    case tk_string : {
+        string temp = yytext;
+        casa( tk_string ); print( temp ); }
         break;
     case '(': 
       casa( '(' ); E(); casa( ')' ); break;
     default:
-      erro( "Operando esperado, encontrado " + lexema );
+      string temp = yytext;
+      erro( "Operando esperado, encontrado " + temp );
   }
 }
+
 
 void casa( int esperado ) {
   if( token == esperado )
@@ -125,6 +130,11 @@ void casa( int esperado ) {
     printf( "Esperado %d, encontrado: %d\n", esperado, token );
     exit( 1 );
   }
+}
+
+void erro( string msg ) {
+  cout << "=== Erro: " << msg << " ===" <<endl;
+  exit( 1 );
 }
 
 void print( string st ) {
