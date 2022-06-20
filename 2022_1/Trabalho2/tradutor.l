@@ -16,7 +16,6 @@ void T_linha();
 void F();
 void SU();
 void P();
-void FUNC();
 void casa( int );
 
 void erro( string msg );
@@ -66,9 +65,7 @@ void A() {
       casa( tk_id );
       print( temp );
       casa( '=' );
-      if( token == tk_func ) {
-        FUNC();
-      } else E();
+      E();
       print( "=" ); }
       break;
     case tk_print : {
@@ -80,15 +77,6 @@ void A() {
   }
   casa( ';' );
   A();
-}
-
-void FUNC() {
-  string temp = yytext;
-  casa( tk_func );
-  temp.erase( temp.size() - 1 );
-  P();
-  casa( ')' );
-  print( temp + " #" );
 }
 
 void E() {
@@ -153,9 +141,17 @@ void F() {
       casa( tk_cte_double ); print( temp ); }
       break;
     case tk_string : {
-        string temp = yytext;
-        casa( tk_string ); print( temp ); }
-        break;
+      string temp = yytext;
+      casa( tk_string ); print( temp ); }
+      break;
+    case tk_func : {
+      string temp = yytext;
+      casa( tk_func );
+      temp.erase( temp.size() - 1 );
+      P();
+      casa( ')' );
+      print( temp + " #" ); }
+      break;
     case '(' : 
       casa( '(' ); E(); casa( ')' ); break;
     default:
