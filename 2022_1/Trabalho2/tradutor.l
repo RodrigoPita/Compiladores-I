@@ -17,6 +17,7 @@ void F();
 void SU();
 void P();
 void FAT();
+void EXP();
 void casa( int );
 
 void erro( string msg );
@@ -110,7 +111,17 @@ void SU() {
   switch ( token ) {
     case '+': casa( '+' ); T();
     case '-': print( "0" ); casa( '-' ); T(); print( "-" ); break;
-    default: F(); 
+    default: F(); EXP();
+  }
+}
+
+void EXP() {
+  /* Exponenciacao */
+  if( token == '^' ) {
+    casa( '^' );
+    E();
+    EXP();
+    print( "^" );
   }
 }
 
@@ -119,6 +130,7 @@ void FAT() {
   if( token == '!' ) {
     casa( '!' ); 
     print( "fat #" );
+    FAT();
   }
 }
 
