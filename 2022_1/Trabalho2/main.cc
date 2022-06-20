@@ -83,6 +83,7 @@ void T_linha() {
   switch( token ) {
     case '*' : casa( '*' ); F(); print( "*" ); T_linha(); break;
     case '/' : casa( '/' ); F(); print( "/" ); T_linha(); break;
+    case '^' : casa( '^' ); F(); print( "^" ); T_linha(); break;
   }
 }
 
@@ -132,7 +133,8 @@ void F() {
   switch( token ) {
     case tk_id : {
       string temp = yytext;
-      casa( tk_id ); print( temp + " @" ); } 
+      casa( tk_id ); print( temp + " @" ); 
+      if( token == '^' ) T_linha(); } 
       break;
     case tk_cte_int: {
       string temp = yytext;
