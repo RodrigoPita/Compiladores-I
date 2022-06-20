@@ -16,6 +16,7 @@ void T_linha();
 void F();
 void SU();
 void P();
+void FAT();
 void casa( int );
 
 void erro( string msg );
@@ -93,6 +94,7 @@ void E_linha() {
 
 void T() {
   SU();
+  FAT();
   T_linha();
 }
 
@@ -108,7 +110,15 @@ void SU() {
   switch ( token ) {
     case '+': casa( '+' ); T();
     case '-': print( "0" ); casa( '-' ); T(); print( "-" ); break;
-    default: F();
+    default: F(); 
+  }
+}
+
+void FAT() {
+  /* Fatorial ! */
+  if( token == '!' ) {
+    casa( '!' ); 
+    print( "fat #" );
   }
 }
 
