@@ -109,7 +109,7 @@ void T_linha() {
 void SU() {
   /* Sinais Unarios */
   switch ( token ) {
-    case '+': casa( '+' ); T();
+    case '+': casa( '+' ); T(); break;
     case '-': print( "0" ); casa( '-' ); T(); print( "-" ); break;
     default: F(); EXP();
   }
