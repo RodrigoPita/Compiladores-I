@@ -15,12 +15,14 @@ void T();
 void T_linha();
 void F();
 void SU();
+void P();
+void FUNC();
 void casa( int );
 
 void erro( string msg );
 void print( string st );
 
-enum { tk_cte_int = 256, tk_cte_double, tk_id, tk_print, tk_string };
+enum { tk_cte_int = 256, tk_cte_double, tk_id, tk_print, tk_string, tk_func };
 
 %}
 
@@ -32,9 +34,10 @@ INT	{D}+
 
 NUM {INT}("."{INT})?([Ee]("+"|"-")?{INT})?
 
-STRING	("\""({L}|{D}|"!"|","|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
+STRING	("\""({L}|{D}|"!"|","|":"|" "|"\'"|"\\"|"\\\""|"\"\""|"/"|"\*")*"\"")
 
 ID	{L}({L}|{D})*
+FUNC {ID}"("
 
 %%
 
@@ -44,7 +47,7 @@ ID	{L}({L}|{D})*
 {INT}       { return tk_cte_int; }
 {NUM}   	{ return tk_cte_double; }
 "print" 	{ return tk_print; }
-
+{FUNC}    { return tk_func; }
 {ID}		  { return tk_id; }
 
 .		{ return yytext[0]; }
@@ -63,7 +66,9 @@ void A() {
       casa( tk_id );
       print( temp );
       casa( '=' );
-      E();
+      if( token == tk_func ) {
+        FUNC();
+      } else E();
       print( "=" ); }
       break;
     case tk_print : {
@@ -71,10 +76,26 @@ void A() {
       E();
       print( "print #" ); }
       break;
+    case tk_func : {
+      casa( tk_func );
+      temp.erase( temp.size() - 1 );
+      P();
+      casa( ')' );
+      print( temp + " #" ); }
+      break;
     default: return;
   }
   casa( ';' );
   A();
+}
+
+void FUNC() {
+  string temp = yytext;
+  casa( tk_func );
+  temp.erase( temp.size() - 1 );
+  P();
+  casa( ')' );
+  print( temp + " #" );
 }
 
 void E() {
@@ -110,6 +131,20 @@ void SU() {
   }
 }
 
+void P() {
+  /* Parametros */
+  switch ( token ) {
+    case ')' : break;
+    case ',' : {
+      casa( ',' );
+      P(); }
+      break;
+    default : 
+      E();
+      P();
+  }
+}
+
 void F() {
   switch( token ) {
     case tk_id : {
@@ -128,7 +163,7 @@ void F() {
         string temp = yytext;
         casa( tk_string ); print( temp ); }
         break;
-    case '(': 
+    case '(' : 
       casa( '(' ); E(); casa( ')' ); break;
     default:
       string temp = yytext;
