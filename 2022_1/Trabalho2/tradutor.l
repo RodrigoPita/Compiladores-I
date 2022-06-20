@@ -76,13 +76,6 @@ void A() {
       E();
       print( "print #" ); }
       break;
-    case tk_func : {
-      casa( tk_func );
-      temp.erase( temp.size() - 1 );
-      P();
-      casa( ')' );
-      print( temp + " #" ); }
-      break;
     default: return;
   }
   casa( ';' );
