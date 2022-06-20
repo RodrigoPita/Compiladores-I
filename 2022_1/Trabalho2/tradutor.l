@@ -156,7 +156,8 @@ void F() {
       break;
     case tk_cte_int: {
       string temp = yytext;
-      casa( tk_cte_int ); print( temp ); }
+      casa( tk_cte_int ); print( temp ); 
+      if( token == '!' ) FAT(); }
       break;
     case tk_cte_double : {
       string temp = yytext;
@@ -173,6 +174,9 @@ void F() {
       P();
       casa( ')' );
       print( temp + " #" ); }
+      break;
+    case '-' : {
+      SU(); }
       break;
     case '(' : 
       casa( '(' ); E(); casa( ')' ); break;
