@@ -28,13 +28,13 @@ void yyerror(const char *);
 S : CMDs { cout << $1.c << "." << endl; }
   ;
 
-CMDs : CMD ';' CMDs   { $ $.c = $1.c + "\n" + $3.c; }
-     | { $ $.c = ""; }
+CMDs : CMD ';' CMDs   { $$.c = $1.c + "\n" + $3.c; }
+     | { $$.c = ""; }
      ;
 
 CMD : A
-    | LET ID '=' E { $ $.c = $2.c + " & " + $2.c + " "  + $4.c + " = ^"; }
-    | LET ID       { $ $.c = $2.c + " &"; }
+    | LET ID '=' E { $$.c = $2.c + " & " + $2.c + " "  + $4.c + " = ^"; }
+    | LET ID       { $$.c = $2.c + " &"; }
     ;
 
 A : ID '=' E { $$.c = $1.c + " " + $3.c + " = ^"; }
