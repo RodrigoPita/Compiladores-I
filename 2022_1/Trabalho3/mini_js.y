@@ -57,6 +57,7 @@ S : CMD S   { $$.c = $1.c + $2.c; }
   ;
 
 CMD : CMD_LET
+    | CMD_IF_ELSE
     | CMD_IF
     | RVALUE ';'    { $$.c = $1.c + "^"; }
     ;
@@ -65,6 +66,10 @@ CMD_IF : IF '(' COND ')' BLOCO { string if_incio = gera_label( "IF" ), if_fim = 
                                 $$.c = $3.c + if_incio + "?" + if_fim + "#" + ( ":" + if_incio )  + $5.c + ( ":" + if_fim ); }
        ;
 
+CMD_IF_ELSE : IF '(' COND ')' BLOCO ELSE BLOCO { string if_incio = gera_label( "ELIF"), if_fim = gera_label( "FILE" ); 
+                                                $$.c = $3.c + "!" + if_incio + "?" + $5.c + if_fim + "#" + ( ":" + if_incio ) + $7.c + ( ":" + if_fim ); }
+            ;
+            
 CMD_LET : LET IDs ';'   { $$ = $2; }
         ;
 

@@ -1,1 +1,1 @@
-a & a 4 = ^ b & b 5 = ^ c & d & a a @ 1 + = b @ > 29 ? 35 # c "a e' maior" "!" + = ^ a @ b @ 1 + < 46 ? 50 # d "a e' menor" = ^ .
+a & a "ABA" = ^ c & c 'CATE' = ^ resultado & a @ c @ == ! 28 ? resultado "Ta' errado!" = ^ 59 # a @ c @ < ! 55 ? resultado "a vem antes de c: " = ^ resultado resultado @ a @ '<' + c @ + + = ^ 59 # resultado "Deu ruim!" = ^ .
