@@ -61,7 +61,8 @@ CMD : CMD_LET
     | RVALUE ';'    { $$.c = $1.c + "^"; }
     ;
 
-CMD_IF : IF '(' COND ')' BLOCO { string fi = gera_label( "FI" ); $$.c = $3.c + "!" + fi + "?" + $5.c + ( ":" + fi ); }
+CMD_IF : IF '(' COND ')' BLOCO { string if_incio = gera_label( "IF" ), if_fim = gera_label( "FI" ); 
+                                $$.c = $3.c + if_incio + "?" + if_fim + "#" + ( ":" + if_incio )  + $5.c + ( ":" + if_fim ); }
        ;
 
 CMD_LET : LET IDs ';'   { $$ = $2; }
@@ -75,16 +76,16 @@ UM_ID : ID      { $$.c = $1.c + "&"; testa_var( $1 ); vars[$1.c[0]] = true; }
       | ID '=' RVALUE        { $$.c = $1.c + "&" + $1.c + $3.c + "=" + "^"; testa_var( $1 ); vars[$1.c[0]] = true; }
       ;
 
-COND : E '>' E
-     | E '<' E 
-     | E MAIG E
-     | E MEIG E
-     | E IG E
+COND : E '>' E    { $$ = gera_operador( $1, $3, $2 ); }
+     | E '<' E    { $$ = gera_operador( $1, $3, $2 ); }
+     | E MAIG E   { $$ = gera_operador( $1, $3, $2 ); }
+     | E MEIG E   { $$ = gera_operador( $1, $3, $2 ); }
+     | E IG E     { $$ = gera_operador( $1, $3, $2 ); }
      | E
      ;
 
 BLOCO : '{' S '}'   { $$.c = $2.c; }
-      | S           { $$.c = $1.c; }
+      | CMD           { $$.c = $1.c; }
       | '{' '}'     { $$.c.clear(); $$.c.push_back( "" ); }
       ;
 

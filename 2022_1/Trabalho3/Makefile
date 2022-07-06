@@ -1,5 +1,6 @@
 all: js Teste_3.txt
-	./js < Teste_3.txt > out.txt 
+	./js < Teste_3.txt > out.txt
+	 ./interpretador < out.txt
 
 lex.yy.c: mini_js.l
 	lex mini_js.l

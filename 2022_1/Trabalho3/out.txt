@@ -1,1 +1,1 @@
-a & a 4 = ^ b & b 5 = ^ c & d & a a @ 1 + = ! 40 ? c "a e' maior" "!" + = ^ a @ ! 40 ? d "a e' menor" = ^ .
+a & a 4 = ^ b & b 5 = ^ c & d & a a @ 1 + = b @ > 29 ? 35 # c "a e' maior" "!" + = ^ a @ b @ 1 + < 46 ? 50 # d "a e' menor" = ^ .
