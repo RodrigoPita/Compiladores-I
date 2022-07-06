@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <stdbool.h>
 
 using namespace std;
 
@@ -18,11 +19,15 @@ int yylex();
 int yyparse();
 void yyerror(const char *);
 
+map<string, bool> vars;
+
 vector<string> concatena( vector<string> a, vector<string> b );
 vector<string> operator+( vector<string> a, vector<string> b );
 vector<string> operator+( vector<string> a, string b );
 vector<string> resolve_enderecos( vector<string> entrada );
 void imprime_codigo( vector<string> codigo );
+void testa_var( Atributos var_teste );
+void testa_var_2( Atributos var_teste );
 
 Atributos gera_operador( Atributos s1, 
                          Atributos s3, 
@@ -30,11 +35,12 @@ Atributos gera_operador( Atributos s1,
 
 %}
 
-%token NUM STR ID LET MAIS_IG
+%token NUM STR ID LET MAIS_IG IF ELSE FOR WHILE MAIG MEIG IG
 
 %right MAIS_IG
 %right '='
 %nonassoc '<' '>'
+%left IG MAIG MEIG
 %left '+' '-'
 %left '*' '/' '%'
 
@@ -54,27 +60,27 @@ CMD : CMD_LET
     | RVALUE ';'    { $$.c = $1.c + "^"; }
     ;
 
-CMD_LET : LET IDs ';'   { $$ = $2; }
+CMD_LET : LET IDs ';'   { $$ = $2;  }
         ;
 
-IDs : UM_ID ',' IDs     { $$.c = $1.c + $3.c; }
-    | UM_ID
+IDs : UM_ID ',' IDs     { $$.c = $1.c + $3.c;  }
+    | UM_ID 
     ;
 
-UM_ID : ID      { $$.c = $1.c + "&"; }
-      | ID '=' RVALUE
-        { $$.c = $1.c + "&" + $1.c + $3.c + "=" + "^"; }
+UM_ID : ID      { $$.c = $1.c + "&"; testa_var( $1 ); vars[$1.c[0]] = true; }
+      | ID '=' RVALUE        { $$.c = $1.c + "&" + $1.c + $3.c + "=" + "^"; testa_var( $1 ); vars[$1.c[0]] = true; }
+      ;
 
 LVALUE : ID
        ;
 
-ATRIB : LVALUE '=' RVALUE   { $$.c = $1.c + $3.c + "="; }
-      | LVALUE MAIS_IG RVALUE   { $$.c = $1.c + $1.c + "@" + $3.c + "+" + "="; }
+ATRIB : LVALUE '=' RVALUE   { $$.c = $1.c + $3.c + "="; testa_var_2( $1 ); }
+      | LVALUE MAIS_IG RVALUE   { $$.c = $1.c + $1.c + "@" + $3.c + "+" + "=";  }
       ;
 
-RVALUE : E
-       | ATRIB
-       | LVALUE
+RVALUE : E    
+       | ATRIB 
+       | LVALUE 
        ;
 
 E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
@@ -83,10 +89,11 @@ E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '/' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '<' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '>' E     { $$ = gera_operador( $1, $3, $2 ); }
+  | LVALUE      { $$.c = $1.c + "@"; }
   | F
   ;
 
-F : NUM
+F : NUM 
   | STR
   | '(' E ')'   { $$.c = $2.c; }
   | '{' '}'     { $$.c.clear(); $$.c.push_back( "{}" ); }
@@ -142,6 +149,22 @@ vector<string> operator+( vector<string> a, vector<string> b ) {
 vector<string> operator+( vector<string> a, string b ) {
   a.push_back( b );
   return a;
+}
+
+void testa_var( Atributos var_teste ) {
+  string v = var_teste.c[0];
+  if( vars[v] ) {
+    cout << "Erro: a variável '" << v << "' já foi declarada na linha 1" << "." << endl;
+    exit(1);    
+  }
+}
+
+void testa_var_2( Atributos var_teste ) {
+  string v = var_teste.c[0];
+  if( !( vars[v] ) ) {
+    cout << "Erro: a variável '" << v << "' não foi declarada." << endl;
+    exit(1);
+  }
 }
 
 int main( int argc, char* argv[] ) {
