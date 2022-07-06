@@ -1,5 +1,5 @@
 all: js Teste_1.txt
-	./js < Teste_1.txt
+	./js < Teste_1.txt > out.txt 
 
 lex.yy.c: mini_js.l
 	lex mini_js.l
