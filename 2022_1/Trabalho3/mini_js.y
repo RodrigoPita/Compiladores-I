@@ -20,7 +20,7 @@ int yyparse();
 void yyerror(const char *);
 
 map<string, bool> vars;
-
+string gera_label( string prefixo );
 vector<string> concatena( vector<string> a, vector<string> b );
 vector<string> operator+( vector<string> a, vector<string> b );
 vector<string> operator+( vector<string> a, string b );
@@ -35,9 +35,9 @@ Atributos gera_operador( Atributos s1,
 
 %}
 
-%token NUM STR ID LET MAIS_IG IF ELSE FOR WHILE MAIG MEIG IG
+%token NUM STR ID LET MAIS_IG IF ELSE FOR WHILE MAIG MEIG IG INCR
 
-%right MAIS_IG
+%right MAIS_IG INCR
 %right '='
 %nonassoc '<' '>'
 %left IG MAIG MEIG
@@ -57,18 +57,35 @@ S : CMD S   { $$.c = $1.c + $2.c; }
   ;
 
 CMD : CMD_LET
+    | CMD_IF
     | RVALUE ';'    { $$.c = $1.c + "^"; }
     ;
 
-CMD_LET : LET IDs ';'   { $$ = $2;  }
+CMD_IF : IF '(' COND ')' BLOCO { string fi = gera_label( "FI" ); $$.c = $3.c + "!" + fi + "?" + $5.c + ( ":" + fi ); }
+       ;
+
+CMD_LET : LET IDs ';'   { $$ = $2; }
         ;
 
-IDs : UM_ID ',' IDs     { $$.c = $1.c + $3.c;  }
+IDs : UM_ID ',' IDs     { $$.c = $1.c + $3.c; }
     | UM_ID 
     ;
 
 UM_ID : ID      { $$.c = $1.c + "&"; testa_var( $1 ); vars[$1.c[0]] = true; }
       | ID '=' RVALUE        { $$.c = $1.c + "&" + $1.c + $3.c + "=" + "^"; testa_var( $1 ); vars[$1.c[0]] = true; }
+      ;
+
+COND : E '>' E
+     | E '<' E 
+     | E MAIG E
+     | E MEIG E
+     | E IG E
+     | E
+     ;
+
+BLOCO : '{' S '}'   { $$.c = $2.c; }
+      | S           { $$.c = $1.c; }
+      | '{' '}'     { $$.c.clear(); $$.c.push_back( "" ); }
       ;
 
 LVALUE : ID
@@ -90,6 +107,7 @@ E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '<' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '>' E     { $$ = gera_operador( $1, $3, $2 ); }
   | LVALUE      { $$.c = $1.c + "@"; }
+  | LVALUE INCR   { $$.c = $1.c + $1.c + "@" + "1" + "+" + "="; }
   | F
   ;
 
@@ -165,6 +183,11 @@ void testa_var_2( Atributos var_teste ) {
     cout << "Erro: a variável '" << v << "' não foi declarada." << endl;
     exit(1);
   }
+}
+
+string gera_label( string prefixo ) {
+  static int n = 0;
+  return prefixo + "_" + to_string( ++n ) + ":";
 }
 
 int main( int argc, char* argv[] ) {

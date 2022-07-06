@@ -37,6 +37,9 @@ WHILE   [Ww][Hh][Ii][Ll][Ee]
 "=="       { atributo_folha();
              return IG; }
 
+"++"       { atributo_folha();
+             return INCR; }
+
 {IF}       { atributo_folha();
              return IF; }
 
