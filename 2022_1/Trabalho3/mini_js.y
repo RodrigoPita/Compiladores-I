@@ -122,7 +122,6 @@ ATRIB : LVALUE '=' RVALUE   { $$.c = $1.c + $3.c + "="; testa_var_2( $1 ); }
 
 RVALUE : E    
        | ATRIB 
-       | LVALUE 
        ;
 
 E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
@@ -132,7 +131,6 @@ E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '<' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '>' E     { $$ = gera_operador( $1, $3, $2 ); }
   | '-' E       { $$.c = inicio_vazio + "0" + $2.c + "-"; }
-  | LVALUE INCR   { $$.c = $1.c + "@" + $1.c + $1.c + "@" + "1" + "+" + "=" + "^"; }
   | F
   ;
 
@@ -140,6 +138,7 @@ F : NUM
   | STR
   | LVALUE     { $$.c = $1.c + "@"; }
   | LVALUEPROP { $$.c = $1.c + "[@]"; }
+  | LVALUE INCR   { $$.c = $1.c + "@" + $1.c + $1.c + "@" + "1" + "+" + "=" + "^"; }
   | '(' RVALUE ')'   { $$.c = $2.c; }
   | '{' '}'     { $$.c.clear(); $$.c.push_back( "{}" ); }
   | '[' ']'     { $$.c.clear(); $$.c.push_back( "[]" ); }
