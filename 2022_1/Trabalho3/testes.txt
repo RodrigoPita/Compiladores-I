@@ -70,7 +70,7 @@ else
 
 Test 5: #5 Objetos e arrays
 --- Input ---
-let obj = {}, i = -2
+let obj = {}, i = -3
 obj.nome = "Manoel";
 obj.nums = []
 obj.nums[0]

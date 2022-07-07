@@ -1,1 +1,1 @@
-a & a "ABA" = ^ c & c 'CATE' = ^ resultado & a @ c @ == ! 28 ? resultado "Ta' errado!" = ^ 59 # a @ c @ < ! 55 ? resultado "a vem antes de c: " = ^ resultado resultado @ a @ '<' + c @ + + = ^ 59 # resultado "Deu ruim!" = ^ .
+obj & obj {} = ^ i & i 0 2 - = ^ obj @ nome "Manoel" [=] ^ obj @ nums [] [=] ^ obj @ nums [@] 0 12 [=] ^ obj @ nums [@] 3 12 [=] ^ obj @ nums [@] 3 obj @ nums [@] 3 [@] 1 + [=] ^ obj @ nums [@] i @ i i @ 1 + = ^ 3 + 45 [=] ^ obj @ 'nom' 'e' + obj @ nome [@] "!" + [=] ^ .

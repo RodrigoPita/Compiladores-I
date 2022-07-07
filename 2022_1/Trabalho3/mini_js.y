@@ -20,6 +20,7 @@ int yyparse();
 void yyerror(const char *);
 
 map<string, bool> vars;
+vector<string> inicio_vazio;
 string gera_label( string prefixo );
 vector<string> concatena( vector<string> a, vector<string> b );
 vector<string> operator+( vector<string> a, vector<string> b );
@@ -38,11 +39,14 @@ Atributos gera_operador( Atributos s1,
 %token NUM STR ID LET MAIS_IG IF ELSE FOR WHILE MAIG MEIG IG INCR
 
 %right MAIS_IG INCR
+
 %right '='
 %nonassoc '<' '>'
 %left IG MAIG MEIG
 %left '+' '-'
 %left '*' '/' '%'
+%left '['
+%left '.'
 
 // Start indica o símbolo inicial da gramática
 // %start S
@@ -59,8 +63,12 @@ S : CMD S   { $$.c = $1.c + $2.c; }
 CMD : CMD_LET
     | CMD_IF_ELSE
     | CMD_IF
+    | CMD_WHILE
     | RVALUE ';'    { $$.c = $1.c + "^"; }
     ;
+
+CMD_WHILE : WHILE '(' COND ')' BLOCO { string while_inicio = gera_label( "WHILE" ), while_fim = gera_label( "ELIHW" );
+                                      $$.c = inicio_vazio + ( ":" + while_inicio ) + $3.c + "!" + while_fim + "?" + $5.c + while_inicio + "#" + ( ":" + while_fim ); }
 
 CMD_IF : IF '(' COND ')' BLOCO { string if_incio = gera_label( "IF" ), if_fim = gera_label( "FI" ); 
                                 $$.c = $3.c + if_incio + "?" + if_fim + "#" + ( ":" + if_incio )  + $5.c + ( ":" + if_fim ); }
@@ -97,8 +105,19 @@ BLOCO : '{' S '}'   { $$.c = $2.c; }
 LVALUE : ID
        ;
 
+LVALUEPROP : LVALUE PROP    { $$.c = $1.c + "@" + $2.c; }
+           ;
+
+PROP : '[' RVALUE ']' PROP  { $$.c = $2.c + "[@]" + $4.c; }
+     | '.' ID PROP          { $$.c = $2.c + "[@]" + $3.c; }
+     | '[' RVALUE ']'       { $$.c = $2.c; }
+     | '.' ID               { $$.c = $2.c; }
+     ;
+
 ATRIB : LVALUE '=' RVALUE   { $$.c = $1.c + $3.c + "="; testa_var_2( $1 ); }
       | LVALUE MAIS_IG RVALUE   { $$.c = $1.c + $1.c + "@" + $3.c + "+" + "=";  }
+      | LVALUEPROP '=' RVALUE { $$.c = $1.c + $3.c + "[=]"; }
+      | LVALUEPROP MAIS_IG RVALUE   { $$.c = $1.c + $1.c + "[@]" + $3.c + "+" + "[=]";  }
       ;
 
 RVALUE : E    
@@ -112,14 +131,16 @@ E : E '+' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '/' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '<' E     { $$ = gera_operador( $1, $3, $2 ); }
   | E '>' E     { $$ = gera_operador( $1, $3, $2 ); }
-  | LVALUE      { $$.c = $1.c + "@"; }
-  | LVALUE INCR   { $$.c = $1.c + $1.c + "@" + "1" + "+" + "="; }
+  | '-' E       { $$.c = inicio_vazio + "0" + $2.c + "-"; }
+  | LVALUE INCR   { $$.c = $1.c + "@" + $1.c + $1.c + "@" + "1" + "+" + "=" + "^"; }
   | F
   ;
 
 F : NUM 
   | STR
-  | '(' E ')'   { $$.c = $2.c; }
+  | LVALUE     { $$.c = $1.c + "@"; }
+  | LVALUEPROP { $$.c = $1.c + "[@]"; }
+  | '(' RVALUE ')'   { $$.c = $2.c; }
   | '{' '}'     { $$.c.clear(); $$.c.push_back( "{}" ); }
   | '[' ']'     { $$.c.clear(); $$.c.push_back( "[]" ); }
          
